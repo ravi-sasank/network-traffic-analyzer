@@ -4,7 +4,9 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 DB_PATH = BASE_DIR / "data" / "traffic.db"
 
-INTERFACE = "en0"
+import os
+
+INTERFACE = os.environ.get("NTA_IFACE", "en0")
 BPF_FILTER = "tcp or udp or icmp or icmp6"
 PROMISCUOUS = True
 
