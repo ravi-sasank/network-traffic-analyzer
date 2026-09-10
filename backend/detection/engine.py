@@ -43,8 +43,12 @@ class DetectionEngine:
         """Run detection on one batch of flushed flows. Returns new alerts."""
         self.window.add_flows(flow_rows)
 
-        # signature rules over the short window
+        # Rules run over the short window, but always include the batch just
+        # flushed - a fast burst can fill one bucket and flush before the
+        # wall-clock window would include it. Union avoids missing it.
         short = self.window.get("short")
+        seen = {id(f) for f in short}
+        short = short + [f for f in flow_rows if id(f) not in seen]
         findings = []
         for rule_fn in rules.ALL_RULES:
             findings.extend(rule_fn(short, self.thresholds))

@@ -9,9 +9,11 @@ from backend.storage import queries as q
 from backend.capture.parser import parse, set_local_addresses
 from backend.capture.local_addrs import get_local_addresses
 from backend.capture.aggregator import FlowAggregator
+from backend.detection.engine import DetectionEngine
 
 conn = init_db()
 agg = FlowAggregator()
+engine = DetectionEngine(conn)
 packet_buffer, dns_buffer, device_buffer = [], [], []
 stats = {"packets": 0, "flows": 0}
 
@@ -23,8 +25,18 @@ def persist(flow_rows):
     q.insert_dns(conn, dns_buffer)
     q.upsert_devices(conn, device_buffer)
     stats["flows"] += len(flow_rows)
+
+    # run detection on this batch
+    dns_batch = list(dns_buffer)
+    alerts = engine.process(flow_rows, dns_batch)
+    for a in alerts:
+        stats["alerts"] = stats.get("alerts", 0) + 1
+        print("  [ALERT] " + a["severity"].upper() + " - "
+              + a["reason"], flush=True)
+
     print("  flushed " + str(len(flow_rows)) + " flows | "
-          + str(stats["packets"]) + " packets seen", flush=True)
+          + str(stats["packets"]) + " packets | "
+          + str(stats.get("alerts", 0)) + " alerts", flush=True)
     packet_buffer, dns_buffer, device_buffer = [], [], []
 
 
