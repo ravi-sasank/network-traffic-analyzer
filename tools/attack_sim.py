@@ -32,7 +32,7 @@ def port_scan(ports=60, delay=0.02):
     print("[port_scan] done - " + str(hits) + " open")
 
 
-def connection_burst(count=150, port=9, delay=0.005):
+def connection_burst(count=600, port=9, delay=0.002):
     """Many rapid connection attempts to one port - SYN flood shape."""
     print("[burst] " + str(count) + " connections to port " + str(port))
     for _ in range(count):
