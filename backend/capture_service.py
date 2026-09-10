@@ -15,7 +15,22 @@ conn = init_db()
 agg = FlowAggregator()
 engine = DetectionEngine(conn)
 packet_buffer, dns_buffer, device_buffer = [], [], []
+MAX_BUFFER = 20000   # hard cap per buffer between flushes
+FLOW_RETENTION_SECONDS = 6 * 3600   # keep 6h of flows on disk
 stats = {"packets": 0, "flows": 0}
+
+
+def _maintenance():
+    import time as _t
+    cutoff = int(_t.time()) - FLOW_RETENTION_SECONDS
+    try:
+        conn.execute("DELETE FROM flows WHERE bucket_ts < ?", (cutoff,))
+        conn.execute("DELETE FROM dns_queries WHERE ts < ?", (cutoff,))
+        conn.commit()
+        conn.execute("PRAGMA wal_checkpoint(TRUNCATE);")
+        print("  [maint] checkpoint + pruned flows older than 6h", flush=True)
+    except Exception as e:
+        print("  [maint] skipped: " + str(e), flush=True)
 
 
 def persist(flow_rows):
@@ -25,6 +40,11 @@ def persist(flow_rows):
     q.insert_dns(conn, dns_buffer)
     q.upsert_devices(conn, device_buffer)
     stats["flows"] += len(flow_rows)
+
+    # periodic maintenance: checkpoint WAL, prune old flows
+    stats["flushes"] = stats.get("flushes", 0) + 1
+    if stats["flushes"] % 30 == 0:      # roughly every 5 min at 10s buckets
+        _maintenance()
 
     # run detection on this batch
     dns_batch = list(dns_buffer)
@@ -41,16 +61,29 @@ def persist(flow_rows):
 
 
 def handle(pkt):
+    try:
+        _handle(pkt)
+    except Exception as e:
+        stats["errors"] = stats.get("errors", 0) + 1
+        # log first few, then stay quiet to avoid flooding
+        if stats["errors"] <= 5:
+            print("  [warn] skipped malformed packet: " + str(e), flush=True)
+
+
+def _handle(pkt):
     rec = parse(pkt)
     if rec is None:
         return
     stats["packets"] += 1
 
-    packet_buffer.append({
-        "ts": rec["ts"], "src_ip": rec["src_ip"], "dst_ip": rec["dst_ip"],
-        "src_port": rec["src_port"], "dst_port": rec["dst_port"],
-        "protocol": rec["protocol"], "length": rec["length"], "info": rec["info"],
-    })
+    if len(packet_buffer) < MAX_BUFFER:
+        packet_buffer.append({
+            "ts": rec["ts"], "src_ip": rec["src_ip"], "dst_ip": rec["dst_ip"],
+            "src_port": rec["src_port"], "dst_port": rec["dst_port"],
+            "protocol": rec["protocol"], "length": rec["length"], "info": rec["info"],
+        })
+    else:
+        stats["dropped"] = stats.get("dropped", 0) + 1
 
     if rec["dns"]:
         dns_buffer.append({
