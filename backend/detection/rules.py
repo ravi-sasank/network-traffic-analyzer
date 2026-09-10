@@ -81,8 +81,10 @@ def detect_connection_burst(flows, thresholds=None):
     for f in flows:
         if f["protocol"] != "TCP" or not f.get("dst_port"):
             continue
+        # count distinct connection attempts (flows), not SYN packets -
+        # one busy TLS flow emits many SYNs and would inflate a packet count
         if "SYN" in _flags(f):
-            by_pair[(f["src_ip"], f["dst_ip"], f["dst_port"])] += f["packet_count"]
+            by_pair[(f["src_ip"], f["dst_ip"], f["dst_port"])] += 1
 
     findings = []
     for (src, dst, port), n in by_pair.items():

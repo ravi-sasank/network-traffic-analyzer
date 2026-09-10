@@ -44,7 +44,9 @@ def test_port_scan_ignores_high_ports_but_completed():
 # ---- connection burst ----
 
 def test_burst_fires():
-    flows = [make_flow("10.0.0.9", "10.0.0.1", 80, flags="SYN", pkts=100)]
+    # A flood is many distinct connection attempts to one port
+    flows = [make_flow("10.0.0.9", "10.0.0.1", 80, flags="SYN")
+             for _ in range(100)]
     found = rules.detect_connection_burst(flows)
     assert len(found) == 1
     assert found[0]["evidence"]["attempts"] == 100

@@ -2,7 +2,7 @@
   "thresholds": {
     "port_scan_min_ports": 15,
     "port_scan_rst_ratio": 0.5,
-    "burst_min_attempts": 60,
+    "burst_min_attempts": 421,
     "icmp_sweep_min_hosts": 10,
     "dns_name_length": 30,
     "dns_min_entropy": 3.5,
@@ -10,28 +10,28 @@
   },
   "observed": {
     "distinct_ports_per_src_per_min": {
-      "n": 21,
-      "max": 3,
-      "mean": 1.24,
-      "p99": 2.8
+      "n": 549,
+      "max": 5,
+      "mean": 1.28,
+      "p99": 3.0
     },
     "syns_per_pair_per_min": {
-      "n": 6,
-      "max": 24,
-      "mean": 20.17,
-      "p99": 23.95
+      "n": 300,
+      "max": 344,
+      "mean": 18.71,
+      "p99": 210.08
     },
     "icmp_hosts_per_min": {
-      "n": 3,
-      "max": 2,
-      "mean": 1.33,
-      "p99": 1.98
+      "n": 11,
+      "max": 3,
+      "mean": 1.55,
+      "p99": 3.0
     },
     "dns_label_length": {
-      "n": 58,
-      "max": 36,
-      "mean": 16.6,
-      "p99": 36.0
+      "n": 650,
+      "max": 42,
+      "mean": 10.03,
+      "p99": 28.0
     }
   },
   "percentile": 99

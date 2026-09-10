@@ -13,6 +13,8 @@ from collections import defaultdict
 EWMA_ALPHA = 0.3          # weight on newest sample; higher = faster adaption
 WARMUP_SAMPLES = 6         # minutes of observation before flagging (60s buckets)
 Z_THRESHOLD = 3.5          # standard deviations to flag
+MIN_BYTES_FLOOR = 51200    # ignore volume anomalies below 50KB/min
+MIN_CONNS_FLOOR = 50       # ignore connection anomalies below 50/min
 
 
 class HostBaseline:
@@ -60,7 +62,7 @@ class BaselineEngine:
         cb.update(conns_this_min)
 
         finding = None
-        if z_bytes >= Z_THRESHOLD:
+        if z_bytes >= Z_THRESHOLD and bytes_this_min >= MIN_BYTES_FLOOR:
             finding = {
                 "rule_name": "volume_anomaly",
                 "src_ip": host, "dst_ip": None,
@@ -71,7 +73,7 @@ class BaselineEngine:
                 "evidence": {"bytes": bytes_this_min, "z_score": round(z_bytes, 2),
                              "baseline_mean": round(bb.mean, 1)},
             }
-        elif z_conns >= Z_THRESHOLD:
+        elif z_conns >= Z_THRESHOLD and conns_this_min >= MIN_CONNS_FLOOR:
             finding = {
                 "rule_name": "connection_anomaly",
                 "src_ip": host, "dst_ip": None,
