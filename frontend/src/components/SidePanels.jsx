@@ -68,7 +68,7 @@ export function RulesPanel() {
   return (
     <>
       {RULES.map(([name, detail]) => (
-        <div key={name} className="mb-[7px] last:mb-0">
+        <div key={name} className="mb-[6px] last:mb-0">
           <div className="flex justify-between items-baseline">
             <span className="text-[10.5px] text-[#a3b5cc]">{name}</span>
             <span className="text-[10px] font-semibold text-[#4ee8a8] tracking-[.6px]">ARMED</span>
@@ -76,8 +76,8 @@ export function RulesPanel() {
           <div className="text-[9px] text-[#6b7f99] pl-[9px] mt-[2px]">{detail}</div>
         </div>
       ))}
-      <div className="mt-[10px] pt-[8px] border-t border-[#1b2a448c] text-[8.5px] text-[#6b7f99] leading-[1.6]">
-        Thresholds derived from 11,425 observed flows at the 99th percentile.
+      <div className="mt-[8px] pt-[7px] border-t border-[#1b2a448c] text-[8px] text-[#6b7f99] leading-[1.5]">
+        Thresholds derived at the 99th percentile of observed traffic.
       </div>
     </>
   )

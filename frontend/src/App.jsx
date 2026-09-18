@@ -9,6 +9,7 @@ import AlertStream from './components/AlertStream'
 import ContactsTable from './components/ContactsTable'
 import ThroughputChart from './components/ThroughputChart'
 import { TelemetryPanel, ProtocolMix, RulesPanel } from './components/SidePanels'
+import ReportExport from './components/ReportExport'
 import { raiseAlarm } from './lib/sound'
 
 export default function App() {
@@ -64,8 +65,11 @@ export default function App() {
           <Panel title="PROTOCOL MIX" meta="1H" className="flex-none">
             <ProtocolMix protocols={protocols || []} />
           </Panel>
-          <Panel title="RULES" meta="CALIBRATED" className="flex-1">
+          <Panel title="RULES" meta="CALIBRATED" className="flex-1 min-h-0">
             <RulesPanel />
+          </Panel>
+          <Panel title="EXPORT" meta="LIVE DATA" className="flex-none border-b-0">
+            <ReportExport />
           </Panel>
         </div>
 
@@ -73,7 +77,7 @@ export default function App() {
         <div className="flex flex-col min-h-0">
           <div className="flex-1 flex flex-col min-h-0">
             <div className="panel-head">
-              <span className="panel-title">ORBITAL NETWORK MAP</span>
+              <h2 className="panel-title">ORBITAL NETWORK MAP</h2>
               <span className="panel-meta">
                 {focus ? `TRACKING ${focus}` : 'ORBIT = TRUST BOUNDARY · RADIUS = THROUGHPUT (LOG)'}
               </span>
@@ -123,7 +127,7 @@ export default function App() {
                style={{ gridTemplateColumns: '1fr 322px' }}>
             <div className="border-r border-[#1b2a44] flex flex-col min-h-0">
               <div className="panel-head">
-                <span className="panel-title">ACTIVE CONTACTS</span>
+                <h2 className="panel-title">ACTIVE CONTACTS</h2>
                 <span className="panel-meta">TOP HOSTS BY VOLUME · 1H</span>
               </div>
               <div className="overflow-y-auto flex-1 min-h-0">
@@ -133,7 +137,7 @@ export default function App() {
             </div>
             <div className="flex flex-col min-h-0">
               <div className="panel-head">
-                <span className="panel-title">THROUGHPUT</span>
+                <h2 className="panel-title">THROUGHPUT</h2>
                 <span className="panel-meta">30 MIN</span>
               </div>
               <ThroughputChart timeline={timeline || []} />

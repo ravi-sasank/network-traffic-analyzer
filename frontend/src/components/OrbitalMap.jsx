@@ -387,8 +387,13 @@ export default function OrbitalMap({ board = [], talkers = [], protocols = [], s
   const sig = board.map(b => `${b.host}:${b.tier}`).join('|') + '#' + talkers.map(t => t.src_ip).join('|')
   useEffect(() => { stateRef.current.rebuild?.(board, talkers, protocols) }, [sig])
 
+  const hostile = board.filter(b => b.tier === 'critical' || b.tier === 'high').length
   return (
-    <div ref={mountRef} className="absolute inset-0 overflow-hidden">
+    <div ref={mountRef} className="absolute inset-0 overflow-hidden"
+         role="img"
+         aria-label={`Orbital network map. ${talkers.length} hosts tracked across `
+           + `five trust-boundary orbits, ${board.length} scored, ${hostile} hostile. `
+           + `Node size encodes traffic volume, colour encodes threat tier.`}>
       <div ref={labelsRef} className="absolute inset-0 pointer-events-none overflow-hidden" />
     </div>
   )

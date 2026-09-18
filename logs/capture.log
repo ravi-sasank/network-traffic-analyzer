@@ -1,0 +1,7 @@
+detection engine ready (gateway allowlisted: 172.20.10.1)
+local addresses: 172.20.10.3, 2401:4900:937b:691a:1483:c07b:129b:2e1d, 2401:4900:937b:691a:e94b:6ad4:520:3abf, 2401:4900:96fb:5d8a:1c9d:479b:18ad:a6aa, 2401:4900:96fb:5d8a:dce:cc16:cc46:97f1, fe80::828:2c6c:346f:cb26
+capturing on en0 | filter: tcp or udp or icmp or icmp6
+Ctrl+C to stop
+
+  flushed 17 flows | 20 packets | 0 alerts
+  flushed 186 flows | 472 packets | 0 alerts

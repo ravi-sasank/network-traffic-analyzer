@@ -126,3 +126,11 @@ async def ws_live(ws: WebSocket):
         pass
     finally:
         conn.close()
+
+
+from backend.api.routes_reports import register as register_reports
+register_reports(app)
+
+
+from backend.api.routes_reports import register as register_reports
+register_reports(app)
